@@ -1,4 +1,12 @@
+#!/usr/bin/python3
+
+
+"""A python program that determines if all boxes in a two-D list can be opened"""
+
+
 def canUnlockAll(boxes):
+    """Each box is numbered sequentially from 0 to n - 1 and each box may contain keys to the other boxes."""
+
     if len(boxes) <= 1:
         return True
 
