@@ -1,73 +1,49 @@
 #!/usr/bin/python3
 '''Reads stdin line by line and parses http request logs'''
 import sys
-import re
 
 
-def initialize_log():
-    '''
-    Creates a dictionary that stores file size and counts of HTTP status codes
-    '''
-    status_codes = [200, 301, 400, 401, 403, 404, 405, 500]
-    log = {'file_size': 0, 'code_list': {
-        str(code): 0 for code in status_codes}}
-    return log
+def print_msg(dict_sc, total_file_size):
+    """
+    Prints the status codes and the file size
+    """
+
+    print("File size: {}".format(total_file_size))
+    for key, val in sorted(dict_sc.items()):
+        if val != 0:
+            print("{}: {}".format(key, val))
 
 
-def parse_line(line, regex, log):
-    '''
-    Processes the log by using regular expressions to find a match.
-    updates the log dict file
-    '''
-    match = regex.fullmatch(line)
+total_file_size = 0
+code = 0
+counter = 0
+dict_sc = {"200": 0,
+           "301": 0,
+           "400": 0,
+           "401": 0,
+           "403": 0,
+           "404": 0,
+           "405": 0,
+           "500": 0}
 
-    if match:
-        status_code, file_size = match.group(1, 2)
-
-        log['file_size'] += int(file_size)
-
-        if status_code.isdecimal():
-            log['code_list'][status_code] += 1
-
-    return log
-
-
-def print_codes(log):
-    '''prints out the file size and status codes in the required format'''
-    print("File size: {}".format(log['file_size']))
-
-    sorted_status_codes = sorted(log['code_list'])
-
-    for code in sorted_status_codes:
-        if log['code_list'][code]:
-            print(f"{code}: {log['code_list'][code]}")
-
-
-def main():
-    '''entry point'''
-    regex = re.compile(
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} - '
-        r'\[\d{4}-\d{2}-\d{2} '
-        r'\d{2}:\d{2}:\d{2}\.\d+\] '
-        r'"GET /projects/260 HTTP/1.1" '
-        r'(.{3}) '
-        r'(\d+)'
-    )
-
-    log = initialize_log()
-
-    line_count = 0
-
+try:
     for line in sys.stdin:
-        line = line.strip()
+        parsed_line = line.split()  # ✄ trimming
+        parsed_line = parsed_line[::-1]  # inverting
 
-        line_count += 1
+        if len(parsed_line) > 2:
+            counter += 1
 
-        parsed_log = parse_line(line, regex, log)
+            if counter <= 10:
+                total_file_size += int(parsed_line[0])  # file size
+                code = parsed_line[1]  # status code
 
-        if line_count % 10 == 0:
-            print_codes(parsed_log)
+                if (code in dict_sc.keys()):
+                    dict_sc[code] += 1
 
+            if (counter == 10):
+                print_msg(dict_sc, total_file_size)
+                counter = 0
 
-if __name__ == '__main__':
-    main()
+finally:
+    print_msg(dict_sc, total_file_size)
