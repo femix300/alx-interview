@@ -6,17 +6,17 @@ from typing import List
 args = sys.argv
 
 if len(args) < 2:
-    print('Usage: nqueens N\n')
+    print('Usage: nqueens N')
     sys.exit(1)
 
 if not args[1].isdecimal():
-    print('N must be a number\n')
+    print('N must be a number')
     sys.exit(1)
 
 args[1] = int(args[1])
 
 if args[1] < 4:
-    print('N must be at least 4\n')
+    print('N must be at least 4')
     sys.exit(1)
 
 
